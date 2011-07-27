@@ -86,6 +86,8 @@ internal class Rygel.L16Transcoder : Rygel.Transcoder {
     }
 
     protected override EncodingProfile get_encoding_profile () {
+        var cont_format = Caps.from_string ("audio/x-wav");
+
         var caps_str = "audio/x-raw-int" +
                        ",channels=" + CHANNELS.to_string () +
                        ",rate=" +  FREQUENCY.to_string () +
@@ -93,12 +95,19 @@ internal class Rygel.L16Transcoder : Rygel.Transcoder {
                        ",depth=" + DEPTH.to_string () +
                        ",signed=" + SIGNED.to_string () +
                        ",endianness=" + ENDIANNESS.to_string();
-        var format = Caps.from_string (caps_str);
+        var audio_format = Caps.from_string (caps_str);
 
-        var encoding_profile =  new EncodingAudioProfile (format,
-                                                          null,
-                                                          null,
-                                                          1);
-        return encoding_profile;
+        var enc_container_profile = new EncodingContainerProfile ("container",
+                                                                  null,
+                                                                  cont_format,
+                                                                  null);
+        var enc_audio_profile =  new EncodingAudioProfile (audio_format,
+                                                           null,
+                                                           null,
+                                                           1);
+
+        enc_container_profile.add_profile (enc_audio_profile);
+
+        return enc_audio_profile;
     }
 }
