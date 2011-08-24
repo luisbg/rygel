@@ -1,4 +1,4 @@
-SUBDIRS = xml icons
+SUBDIRS = xml icons presets
 
 sysconf_DATA = rygel.conf
 
