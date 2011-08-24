@@ -113,7 +113,7 @@ internal class Rygel.MP2TSTranscoder : Rygel.Transcoder {
                                                                   cont_format,
                                                                   null);
         var enc_video_profile = new EncodingVideoProfile (video_format,
-                                                          null,
+                                                          "stream high quality",
                                                           video_restriction,
                                                           1);
         var enc_audio_profile = new EncodingAudioProfile (audio_format,
