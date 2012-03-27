@@ -1,10 +1,11 @@
 /*
  * Copyright (C) 2008 Zeeshan Ali <zeenix@gmail.com>.
- * Copyright (C) 2008 Nokia Corporation.
+ * Copyright (C) 2008-2012 Nokia Corporation.
  * Copyright (C) 2010 MediaNet Inh.
  *
  * Authors: Zeeshan Ali <zeenix@gmail.com>
  *          Sunil Mohan Adapa <sunil@medhas.org>
+ *         Jens Georg <jensg@openismus.com>
  *
  * This file is part of Rygel.
  *
@@ -25,21 +26,19 @@
 
 using GUPnP;
 using Gee;
+using Tracker;
 
 /**
  * A container listing a Tracker search result.
  */
 public class Rygel.Tracker.SearchContainer : SimpleContainer {
     /* class-wide constants */
-    private const string TRACKER_SERVICE = "org.freedesktop.Tracker1";
-    private const string RESOURCES_PATH = "/org/freedesktop/Tracker1/Resources";
-
     private const string MODIFIED_PROPERTY = "nfo:fileLastModified";
 
     public SelectionQuery query;
     public ItemFactory item_factory;
 
-    private ResourcesIface resources;
+    private Sparql.Connection resources;
 
     private static HashMap<string, uint> update_id_hash;
 
@@ -98,15 +97,11 @@ public class Rygel.Tracker.SearchContainer : SimpleContainer {
                                          order_by);
 
         try {
-            this.resources = Bus.get_proxy_sync
-                                        (BusType.SESSION,
-                                         TRACKER_SERVICE,
-                                         RESOURCES_PATH,
-                                         DBusProxyFlags.DO_NOT_LOAD_PROPERTIES);
+            this.resources = Connection.get ();
 
             this.get_children_count.begin ();
-        } catch (IOError error) {
-            critical (_("Failed to connect to session bus: %s"), error.message);
+        } catch (Error error) {
+            critical (_("Failed to get Tracker connection: %s"), error.message);
         }
     }
 
@@ -139,14 +134,20 @@ public class Rygel.Tracker.SearchContainer : SimpleContainer {
         var query = this.create_query (expression as RelationalExpression,
                                        (int) offset,
                                        (int) max_count);
+
         if (query != null) {
             yield query.execute (this.resources);
 
             /* Iterate through all items */
-            for (uint i = 0; i < query.result.length[0]; i++) {
-                var id = this.create_child_id_for_urn (query.result[i, 0]);
-                var uri = query.result[i, 1];
-                string[] metadata = this.slice_strvv_tail (query.result, i, 1);
+            while (yield query.result.next_async ()) {
+                var id = this.create_child_id_for_urn
+                                        (query.result.get_string (0));
+                var uri = query.result.get_string (1);
+
+                string[] metadata = new string[0];
+                for (int i = 1; i < query.result.n_columns; ++i) {
+                    metadata += query.result.get_string (i);
+                }
 
                 var item = this.item_factory.create (id, uri, this, metadata);
                 results.add (item);
@@ -215,8 +216,11 @@ public class Rygel.Tracker.SearchContainer : SimpleContainer {
 
             yield query.execute (this.resources);
 
-            this.child_count = int.parse (query.result[0,0]);
-            this.updated ();
+            if (query.result.next ()) {
+                this.child_count = int.parse (query.result.get_string (0));
+                this.updated ();
+            }
+
         } catch (GLib.Error error) {
             critical (_("Error getting item count under category '%s': %s"),
                       this.item_factory.category,
@@ -324,6 +328,7 @@ public class Rygel.Tracker.SearchContainer : SimpleContainer {
         return filter;
     }
 
+#if 0
     /**
      * Chops the tail of a particular row in a 2-dimensional string array.
      *
@@ -343,5 +348,6 @@ public class Rygel.Tracker.SearchContainer : SimpleContainer {
 
         return slice;
     }
+#endif
 }
 
