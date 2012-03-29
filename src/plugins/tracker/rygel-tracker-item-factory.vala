@@ -106,13 +106,13 @@ public abstract class Rygel.Tracker.ItemFactory {
     protected virtual void set_metadata (MediaItem item,
                                          string    uri,
                                          string[]  metadata) throws GLib.Error {
-        if (metadata[Metadata.TITLE] != "")
+        if (metadata[Metadata.TITLE] != null)
             item.title = metadata[Metadata.TITLE];
         else
             /* If title wasn't provided, use filename instead */
             item.title = metadata[Metadata.FILE_NAME];
 
-        if (metadata[Metadata.SIZE] != "")
+        if (metadata[Metadata.SIZE] != null)
             item.size = int64.parse (metadata[Metadata.SIZE]);
         else
             // If its in tracker store and size is unknown, it most probably
@@ -122,11 +122,11 @@ public abstract class Rygel.Tracker.ItemFactory {
 
         item.place_holder = bool.parse (metadata[Metadata.PLACE_HOLDER]);
 
-        if (metadata[Metadata.DATE] != "")
+        if (metadata[Metadata.DATE] != null)
             item.date = metadata[Metadata.DATE];
 
         var profile = null as DLNAProfile;
-        if (metadata[Metadata.DLNA_PROFILE] != "") {
+        if (metadata[Metadata.DLNA_PROFILE] != null) {
             item.dlna_profile = metadata[Metadata.DLNA_PROFILE];
             profile = this.discoverer.get_profile (item.dlna_profile);
         }

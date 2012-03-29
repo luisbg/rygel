@@ -92,30 +92,30 @@ public class Rygel.Tracker.MusicItemFactory : ItemFactory {
 
         var music = item as MusicItem;
 
-        if (metadata[MusicMetadata.DURATION] != "" &&
+        if (metadata[MusicMetadata.DURATION] != null &&
             metadata[MusicMetadata.DURATION] != "0") {
             music.duration = int.parse (metadata[MusicMetadata.DURATION]);
         }
 
-        if (metadata[MusicMetadata.SAMPLE_RATE] != "") {
+        if (metadata[MusicMetadata.SAMPLE_RATE] != null) {
             music.sample_freq = int.parse
                                         (metadata[MusicMetadata.SAMPLE_RATE]);
         }
 
-        if (metadata[MusicMetadata.CHANNELS] != "") {
+        if (metadata[MusicMetadata.CHANNELS] != null) {
             music.channels = int.parse (metadata[MusicMetadata.CHANNELS]);
         }
 
-        if (metadata[MusicMetadata.BITS_PER_SAMPLE] != "") {
+        if (metadata[MusicMetadata.BITS_PER_SAMPLE] != null) {
             var bits_per_sample = metadata[MusicMetadata.BITS_PER_SAMPLE];
             music.bits_per_sample = int.parse (bits_per_sample);
         }
 
-        if (metadata[MusicMetadata.BITRATE] != "") {
+        if (metadata[MusicMetadata.BITRATE] != null) {
             music.bitrate = int.parse (metadata[MusicMetadata.BITRATE]) / 8;
         }
 
-        if (metadata[MusicMetadata.AUDIO_TRACK_NUM] != "") {
+        if (metadata[MusicMetadata.AUDIO_TRACK_NUM] != null) {
             var track_number = metadata[MusicMetadata.AUDIO_TRACK_NUM];
             music.track_number = int.parse (track_number);
         }
@@ -123,15 +123,15 @@ public class Rygel.Tracker.MusicItemFactory : ItemFactory {
         // FIXME: For the following three properties:
         // Once converted to libtracker-sparql, check for null again.
         // DBus translates a (null) to ''
-        if (metadata[MusicMetadata.AUDIO_ARTIST] != "") {
+        if (metadata[MusicMetadata.AUDIO_ARTIST] != null) {
             music.artist = metadata[MusicMetadata.AUDIO_ARTIST];
         }
 
-        if (metadata[MusicMetadata.AUDIO_ALBUM] != "") {
+        if (metadata[MusicMetadata.AUDIO_ALBUM] != null) {
             music.album = metadata[MusicMetadata.AUDIO_ALBUM];
         }
 
-        if (metadata[MusicMetadata.AUDIO_GENRE] != "") {
+        if (metadata[MusicMetadata.AUDIO_GENRE] != null) {
             music.genre = metadata[MusicMetadata.AUDIO_GENRE];
         }
 
